@@ -5,11 +5,13 @@
 
 EC11 encoder;
 static int mode = 0;
+static int color = 0;
 static int tmode[3] = { 0,0,10 };
-boolean b_mode = false;
+boolean b_mode = false, b_color = false;
 Adafruit_NeoPixel neopixels = Adafruit_NeoPixel(NBLED, PIN_LED, NEO_GRB + NEO_KHZ800);
-uint32_t color;
-
+uint32_t setcolor;
+// Color
+int colorTable[7][3] = { { 255,255,255 }, { 255,0,0 }, { 0,255,0 }, { 0, 0, 255 }, { 255,255,0 }, { 0,255,255 }, { 255, 0, 255 } };
 
 //
 // setup
@@ -22,9 +24,10 @@ void setup() {
 	pinMode(PIN_A, INPUT_PULLUP);
 	pinMode(PIN_B, INPUT_PULLUP);
 	pinMode(PIN_BUTTON, INPUT);
+	pinMode(PIN_COLOR, INPUT);
 	prepare();
 
-	color = neopixels.Color(254, 254, 254, GAMMA);
+	setcolor = neopixels.Color(colorTable[color][0], colorTable[color][1], colorTable[color][2], GAMMA);
 	neopixels.setBrightness(tmode[2]);
 	neopixels.begin();
 	neopixels.show();
@@ -34,21 +37,19 @@ void setup() {
 // loop
 //
 void loop() {
+	ReadInput();
+	ReadCoder();
+	setcolor = neopixels.Color(colorTable[color][0], colorTable[color][1], colorTable[color][2], GAMMA);
 	neopixels.setBrightness(tmode[2]);
 
 	for (int i = 0; i <= tmode[0]; i++)
 		neopixels.setPixelColor(i, 0);
-	
 	for (int i = 0 + tmode[0]; i <= tmode[1] + tmode[0]; i++)
-		neopixels.setPixelColor(i, color);
+		neopixels.setPixelColor(i, setcolor);
 	for (int i = (tmode[1] + 1) + tmode[0]; i <= (NBLED - 1) + tmode[0]; i++)
 		neopixels.setPixelColor(i, 0);
-
-
 	neopixels.show();
 
-	ReadInput();
-	ReadCoder();
 	// Wait quite some time to demonstrate that we can check for events fairly infrequently and still not miss them.
 	delay(200);
 }
@@ -108,18 +109,26 @@ void ReadCoder()
 //
 void ReadInput()
 {
+	//Read EC11
 	if (digitalRead(PIN_BUTTON) == HIGH && !b_mode) {
 		b_mode = true;
 		mode += 1;
 		if (mode > 2)
 			mode = 0;
-#ifdef DEBUG
-		Serial.print("Mode: ");
-		Serial.println(mode);
-#endif // DEBUG
 	}
 	if (digitalRead(PIN_BUTTON) == LOW)
 		b_mode = false;
+
+	//Read button color
+	if (digitalRead(PIN_COLOR) == HIGH && !b_color) {
+		b_color = true;
+		color += 1;
+		if (color > 6)
+			color = 0;
+		Serial.println(color);
+	}
+	if (digitalRead(PIN_COLOR) == LOW)
+		b_color = false;
 }
 
 //

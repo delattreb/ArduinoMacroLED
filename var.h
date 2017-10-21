@@ -10,6 +10,7 @@
 #define GAMMA 0
 
 // PIN
+#define PIN_COLOR 9
 #define PIN_BUTTON 6
 #define PIN_A 2
 #define PIN_B 3
