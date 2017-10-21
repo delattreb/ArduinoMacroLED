@@ -36,9 +36,12 @@ void setup() {
 void loop() {
 	neopixels.setBrightness(tmode[2]);
 
-	for (int i = 0; i <= tmode[1]; i++)
+	for (int i = 0; i <= tmode[0]; i++)
+		neopixels.setPixelColor(i, 0);
+	
+	for (int i = 0 + tmode[0]; i <= tmode[1] + tmode[0]; i++)
 		neopixels.setPixelColor(i, color);
-	for (int i = tmode[1] + 1; i <= NBLED - 1; i++)
+	for (int i = (tmode[1] + 1) + tmode[0]; i <= (NBLED - 1) + tmode[0]; i++)
 		neopixels.setPixelColor(i, 0);
 
 
@@ -66,8 +69,8 @@ void ReadCoder()
 				tmode[mode] += e.count;
 
 			if (mode == 0)
-				if (tmode[mode] >= MODE_0_MAX)
-					tmode[mode] = MODE_0_MAX;
+				if (tmode[mode] + tmode[1] > MODE_0_MAX)
+					tmode[mode] = tmode[mode] - e.count;
 			if (mode == 1)
 				if (tmode[mode] >= MODE_1_MAX)
 					tmode[mode] = MODE_1_MAX;
