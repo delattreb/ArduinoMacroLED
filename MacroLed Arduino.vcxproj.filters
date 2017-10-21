@@ -27,5 +27,8 @@
     <ClInclude Include="ec11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="var.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
