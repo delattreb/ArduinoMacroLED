@@ -1,7 +1,7 @@
 
 
-#define DEBUG
-#define INFO
+//#define DEBUG
+//#define INFO
 #define BAUDS_RATE 9600
 
 #define PIN_LED 5
