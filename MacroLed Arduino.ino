@@ -6,7 +6,7 @@
 EC11 encoder;
 static int mode = 0;
 static int color = 0;
-static int tmode[3] = { 0,0,10 };
+static int tmode[3] = { 0,0,DEFAULT_INT };
 boolean b_mode = false, b_color = false;
 Adafruit_NeoPixel neopixels = Adafruit_NeoPixel(NBLED, PIN_LED, NEO_GRB + NEO_KHZ800);
 uint32_t setcolor;
@@ -19,12 +19,14 @@ int colorTable[7][3] = { { 255,255,255 }, { 255,0,0 }, { 0,255,0 }, { 0, 0, 255 
 void setup() {
 #ifdef DEBUG
 	Serial.begin(BAUDS_RATE);
+	Serial.println("Init");
 #endif // DEBUG
 
 	pinMode(PIN_A, INPUT_PULLUP);
 	pinMode(PIN_B, INPUT_PULLUP);
 	pinMode(PIN_BUTTON, INPUT);
 	pinMode(PIN_COLOR, INPUT);
+
 	prepare();
 
 	setcolor = neopixels.Color(colorTable[color][0], colorTable[color][1], colorTable[color][2], GAMMA);
@@ -49,9 +51,6 @@ void loop() {
 	for (int i = (tmode[1] + 1) + tmode[0]; i <= (NBLED - 1) + tmode[0]; i++)
 		neopixels.setPixelColor(i, 0);
 	neopixels.show();
-
-	// Wait quite some time to demonstrate that we can check for events fairly infrequently and still not miss them.
-	delay(200);
 }
 
 //
@@ -61,8 +60,6 @@ void ReadCoder()
 {
 	EC11Event e;
 	if (encoder.read(&e)) {
-		// OK, got an event waiting to be handled.
-
 		if (e.type == EC11Event::StepCW) {
 			if (mode == 2)
 				tmode[mode] += e.count * MODE_2_MULT;
@@ -109,7 +106,7 @@ void ReadCoder()
 //
 void ReadInput()
 {
-	//Read EC11
+	//Read EC11 coder
 	if (digitalRead(PIN_BUTTON) == HIGH && !b_mode) {
 		b_mode = true;
 		mode += 1;
@@ -125,7 +122,6 @@ void ReadInput()
 		color += 1;
 		if (color > 6)
 			color = 0;
-		Serial.println(color);
 	}
 	if (digitalRead(PIN_COLOR) == LOW)
 		b_color = false;
