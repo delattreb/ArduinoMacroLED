@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "ec11.h"
 #include <Wire.h>
 #include "var.h"
