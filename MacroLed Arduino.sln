@@ -5,7 +5,13 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MacroLed Arduino", "MacroLed Arduino.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArduinoLibraries", "..\ArduinoLibraries\ArduinoLibraries.vcxitems", "{1B7FCBD7-384F-4893-9701-5F085C6FD390}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\ArduinoLibraries\ArduinoLibraries.vcxitems*{1b7fcbd7-384f-4893-9701-5f085c6fd390}*SharedItemsImports = 9
+		..\ArduinoLibraries\ArduinoLibraries.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
