@@ -7,7 +7,7 @@
 EC11 encoder;
 static int mode = 0;
 static int color = 0;
-static int tmode[3] = { 0,0,DEFAULT_INT };
+static int tablemode[3] = { 0,0,DEFAULT_INT };
 boolean b_mode = false, b_color = false;
 Adafruit_NeoPixel neopixels = Adafruit_NeoPixel(NBLED, PIN_LED, NEO_GRB + NEO_KHZ800);
 uint32_t setcolor;
@@ -20,7 +20,6 @@ int colorTable[7][3] = { { 255,255,255 }, { 255,0,0 }, { 0,255,0 }, { 0, 0, 255 
 void setup() {
 #ifdef DEBUG
 	Serial.begin(BAUDS_RATE);
-	Serial.println("Init");
 #endif // DEBUG
 
 	pinMode(PIN_A, INPUT_PULLUP);
@@ -31,7 +30,7 @@ void setup() {
 	prepare();
 
 	setcolor = neopixels.Color(colorTable[color][0], colorTable[color][1], colorTable[color][2], GAMMA);
-	neopixels.setBrightness(tmode[2]);
+	neopixels.setBrightness(tablemode[2]);
 	neopixels.begin();
 	neopixels.show();
 }
@@ -43,14 +42,17 @@ void loop() {
 	ReadInput();
 	ReadCoder();
 	setcolor = neopixels.Color(colorTable[color][0], colorTable[color][1], colorTable[color][2], GAMMA);
-	neopixels.setBrightness(tmode[2]);
+	neopixels.setBrightness(tablemode[2]);
 
-	for (int i = 0; i <= tmode[0]; i++)
+	//Switch off pixel
+	for (int i = 0; i <= NBLED - 1; i++)
 		neopixels.setPixelColor(i, 0);
-	for (int i = 0 + tmode[0]; i <= tmode[1] + tmode[0]; i++)
-		neopixels.setPixelColor(i, setcolor);
-	for (int i = (tmode[1] + 1) + tmode[0]; i <= (NBLED - 1) + tmode[0]; i++)
-		neopixels.setPixelColor(i, 0);
+	//Draw pixel
+	for (int i = 0; i <= tablemode[1]; i++)
+		if (i + tablemode[0] >= NBLED)
+			neopixels.setPixelColor((i + tablemode[0]) - (NBLED), setcolor);
+		else
+			neopixels.setPixelColor(i + tablemode[0], setcolor);
 	neopixels.show();
 }
 
@@ -62,43 +64,37 @@ void ReadCoder()
 	EC11Event e;
 	if (encoder.read(&e)) {
 		if (e.type == EC11Event::StepCW) {
-			if (mode == 2)
-				tmode[mode] += e.count * MODE_2_MULT;
-			else
-				tmode[mode] += e.count;
-
 			if (mode == 0)
-				if (tmode[mode] + tmode[1] > MODE_0_MAX)
-					tmode[mode] = tmode[mode] - e.count;
+				tablemode[mode] = (tablemode[mode] + e.count) % NBLED;
 			if (mode == 1)
-				if (tmode[mode] >= MODE_1_MAX)
-					tmode[mode] = MODE_1_MAX;
-			if (mode == 2)
-				if (tmode[mode] >= MODE_2_MAX)
-					tmode[mode] = MODE_2_MAX;
+			{
+				tablemode[mode] += e.count;
+				if (tablemode[mode] >= NBLED - 1)
+					tablemode[mode] = NBLED - 1;
+			}
+			if (mode == 2) {
+				tablemode[mode] += e.count * MODE_2_MULT;
+				if (tablemode[mode] >= MODE_2_MAX)
+					tablemode[mode] = MODE_2_MAX;
+			}
 		}
 		else {
-			if (mode == 2)
-				tmode[mode] -= e.count * MODE_2_MULT;
-			else
-				tmode[mode] -= e.count;
-
 			if (mode == 0)
-				if (tmode[mode] <= 0)
-					tmode[mode] = 0;
-			if (mode == 1)
-				if (tmode[mode] <= 0)
-					tmode[mode] = 0;
-			if (mode == 2)
-				if (tmode[mode] <= 10)
-					tmode[mode] = 10;
+				if (tablemode[mode] - e.count < 0)
+					tablemode[mode] = NBLED - e.count;
+				else
+					tablemode[mode] = (tablemode[mode] - e.count) % NBLED;
+			if (mode == 1) {
+				tablemode[mode] -= e.count;
+				if (tablemode[mode] <= 0)
+					tablemode[mode] = 0;
+			}
+			if (mode == 2) {
+				tablemode[mode] -= e.count * MODE_2_MULT;
+				if (tablemode[mode] <= MODE_2_MIN)
+					tablemode[mode] = MODE_2_MIN;
+			}
 		}
-#ifdef DEBUG
-		Serial.print("TMode: ");
-		Serial.print(mode);
-		Serial.print(" ");
-		Serial.println(tmode[mode]);
-#endif // DEBUG
 	}
 }
 

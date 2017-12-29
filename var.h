@@ -1,9 +1,10 @@
-
+// VAR
 
 //#define DEBUG
 //#define INFO
 #define BAUDS_RATE 115200
 
+// App
 #define NBLED 24	
 #define GAMMA 0
 
@@ -18,7 +19,6 @@
 #define PIN_B 3
 
 // Max mode 1:NBLed 2:Luminosity
-#define MODE_0_MAX NBLED-1
-#define MODE_1_MAX NBLED-1
+#define MODE_2_MIN 10
 #define MODE_2_MAX 250
 #define MODE_2_MULT 10
