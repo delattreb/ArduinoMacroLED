@@ -7,6 +7,7 @@
 // App
 #define NBLED 24	
 #define GAMMA 0
+#define NB_COLOR 8
 
 // PIN
 #define PIN_COLOR 6

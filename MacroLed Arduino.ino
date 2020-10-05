@@ -11,8 +11,9 @@ static int tablemode[3] = { 0,0,DEFAULT_INT };
 boolean b_mode = false, b_color = false;
 Adafruit_NeoPixel neopixels = Adafruit_NeoPixel(NBLED, PIN_LED, NEO_GRB + NEO_KHZ800);
 uint32_t setcolor;
-// Color
-int colorTable[7][3] = { { 255,255,255 }, { 255,0,0 }, { 0,255,0 }, { 0, 0, 255 }, { 255,255,0 }, { 0,255,255 }, { 255, 0, 255 } };
+// Color 
+//Blanc, Rouge, Vert, Bleu, Cyan, Jaune, Violet, Orange, Rose
+int colorTable[NB_COLOR + 1][3] = { { 255,255,255 }, { 255,0,0 }, { 0,255,0 }, { 0, 0, 255 }, { 255,255,0 }, { 0,255,255 }, { 255, 0, 255 }, { 255, 127, 0 }, { 127, 0, 255} };
 
 //
 // setup
@@ -117,7 +118,7 @@ void ReadInput()
 	if (digitalRead(PIN_COLOR) == HIGH && !b_color) {
 		b_color = true;
 		color += 1;
-		if (color > 6)
+		if (color > NB_COLOR)
 			color = 0;
 	}
 	if (digitalRead(PIN_COLOR) == LOW)
